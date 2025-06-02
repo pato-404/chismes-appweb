@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chismeando</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Base styles for light mode */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc; /* Very light background, almost white */
+            color: #1f2937; /* Dark gray text */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text for dark mode */
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .dark-mode ::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .dark-mode ::-webkit-scrollbar-thumb {
+            background: #4a5568;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Smooth transitions for interactive elements */
+        button, .interactive-element {
+            transition: all 0.2s ease-in-out;
+        }
+        button:hover, .interactive-element:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        /* Accent color for buttons and titles (Electric Blue) */
+        .accent-color {
+            color: #007bff;
+        }
+        .bg-accent-color {
+            background-color: #007bff;
+        }
+        .hover\:bg-accent-color-dark:hover {
+            background-color: #0056b3;
+        }
+        .border-accent-color {
+            border-color: #007bff;
+        }
+        .focus\:ring-accent-color:focus {
+            --tw-ring-color: #007bff;
+        }
+
+        /* Modal styles - Asegura que los modales sean responsivos y estén centrados */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #ffffff; /* Light background for modal */
+            margin: auto;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%; /* Ancho adaptable */
+            max-width: 700px; /* Ancho máximo para pantallas grandes */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .dark-mode .modal-content {
+            background-color: #2d3748; /* Dark background for modal */
+            color: #e2e8f0;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #666;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .dark-mode .close-button:hover,
+        .dark-mode .close-button:focus {
+            color: #e2e8f0;
+        }
+
+        /* Screen management - Controla la visibilidad de las diferentes secciones */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* Bottom Navigation Bar Styles */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff; /* Light background */
+            border-top: 1px solid #e2e8f0; /* Light border */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); /* Shadow for depth */
+            z-index: 50;
+        }
+        .dark-mode .bottom-nav {
+            background-color: #1a202c; /* Dark background */
+            border-top: 1px solid #2d3748; /* Dark border */
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6b7280; /* Gray text */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 500;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            flex: 1; /* Distribute space evenly */
+            min-width: 50px; /* Ensure minimum width for items */
+        }
+        .bottom-nav-item:hover {
+            color: #007bff; /* Accent color on hover */
+            background-color: #f0f4f8; /* Light background on hover */
+        }
+        .dark-mode .bottom-nav-item:hover {
+            color: #818cf8; /* Lighter accent color on hover for dark mode */
+            background-color: #2d3748; /* Darker background on hover for dark mode */
+        }
+        .bottom-nav-item.active-nav {
+            color: #007bff; /* Accent color for active item */
+            font-weight: 600;
+        }
+        .dark-mode .bottom-nav-item.active-nav {
+            color: #818cf8; /* Lighter accent color for active item in dark mode */
+        }
+        .bottom-nav-item i {
+            font-size: 1.25rem; /* text-xl */
+            margin-bottom: 0.25rem;
+        }
+
+        /* Toast Notification Styles */
+        .toast {
+            visibility: hidden; /* Hidden by default. Spelled as 'visibility' */
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1001;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            font-size: 17px;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        .toast.show {
+            visibility: visible;
+            -webkit-animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+            animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+        @-webkit-keyframes fadeIn {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+        @keyframes fadeIn {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+        @-webkit-keyframes fadeOut {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+        @keyframes fadeOut {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white dark:bg-gray-800 shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-0">Chismeando</h1>
+            <div class="flex items-center space-x-2 sm:space-x-4 flex-wrap justify-center sm:justify-end">
+                <button id="publishContentBtn" class="bg-accent-color text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold shadow-md hover:bg-accent-color-dark transition duration-300 ease-in-out text-sm sm:text-base mb-2 sm:mb-0">
+                    <i class="fas fa-plus-circle mr-1 sm:mr-2"></i> Publicar Contenido
+                </button>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-color">
+                    <i class="fas fa-sun light-mode-icon"></i>
+                    <i class="fas fa-moon hidden dark-mode-icon"></i>
+                </button>
+                <button id="logoutBtn" class="hidden p-2 rounded-full bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow p-4 pb-20 overflow-y-auto">
+
+            <div id="presentationScreen" class="screen flex flex-col items-center justify-center min-h-[calc(100vh-120px)] p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-2xl text-center">
+                    <i class="fas fa-comments text-6xl accent-color mb-6"></i>
+                    <h2 class="text-3xl font-bold mb-4 text-gray-800 dark:text-white">¡Bienvenido a Chismeando!</h2>
+                    <p class="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+                        Tu rincón favorito para **descubrir y compartir** lo último en chismes y noticias al instante.
+                        En Chismeando, estar al tanto de lo que sucede es fácil y divertido.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <i class="fas fa-bullhorn text-4xl text-purple-500 mb-2"></i>
+                            <p class="font-semibold text-lg text-gray-800 dark:text-white">Chismes</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Noticias de última hora del mundo del entretenimiento y más allá.</p>
+                        </div>
+                        <div class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <i class="fas fa-newspaper text-4xl text-green-500 mb-2"></i>
+                            <p class="font-semibold text-lg text-gray-800 dark:text-white">Noticias</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Mantente informado con los titulares más relevantes.</p>
+                        </div>
+                        <div class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <i class="fas fa-plus-circle text-4xl text-blue-500 mb-2"></i>
+                            <p class="font-semibold text-lg text-gray-800 dark:text-white">Publica</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Comparte tus propios chismes o noticias con la comunidad.</p>
+                        </div>
+                    </div>
+                    <button id="startAppBtn" class="w-full bg-accent-color text-white p-3 rounded-lg font-semibold hover:bg-accent-color-dark transition duration-300 ease-in-out">
+                        Empezar a Chismear <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="authScreen" class="screen hidden flex flex-col items-center justify-center min-h-[calc(100vh-120px)]">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-md">
+                    <h2 class="text-3xl font-bold text-center mb-8 accent-color" id="authTitle">Inicio de Sesión</h2>
+
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label for="loginUsername" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de Usuario</label>
+                            <input type="text" id="loginUsername" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        </div>
+                        <div>
+                            <label for="loginPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
+                            <input type="password" id="loginPassword" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        </div>
+                        <button type="submit" class="w-full bg-accent-color text-white p-3 rounded-lg font-semibold hover:bg-accent-color-dark transition duration-300 ease-in-out">
+                            Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <form id="registerForm" class="space-y-4 hidden">
+                        <div>
+                            <label for="registerUsername" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de Usuario</label>
+                            <input type="text" id="registerUsername" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        </div>
+                        <div>
+                            <label for="registerPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
+                            <input type="password" id="registerPassword" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        </div>
+                        <div>
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Contraseña</label>
+                            <input type="password" id="confirmPassword" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 ease-in-out">
+                            Registrarse
+                        </button>
+                    </form>
+
+                    <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+                        <button id="toggleAuthMode" class="text-accent-color hover:underline">
+                            ¿No tienes cuenta? Regístrate aquí.
+                        </button>
+                    </p>
+                    <p id="authMessage" class="text-center text-red-500 text-sm mt-2"></p>
+                </div>
+            </div>
+
+            <div id="gossipScreen" class="screen hidden">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-purple-700 dark:text-purple-400">Últimos Chismes</h2>
+                    <div class="mb-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <input type="text" id="gossipSearchInput" placeholder="Buscar chismes..." class="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white">
+                        <select id="gossipFilterSelect" class="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white">
+                            <option value="all">Todos los Chismes</option>
+                            <option value="myGossip">Mis Chismes</option>
+                        </select>
+                    </div>
+                    <div id="gossipPostsContainer" class="space-y-6">
+                        </div>
+                </div>
+            </div>
+
+            <div id="newsScreen" class="screen hidden">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-green-700 dark:text-green-400">Últimas Noticias</h2>
+                    <div class="mb-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <input type="text" id="newsSearchInput" placeholder="Buscar noticias..." class="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white">
+                        <select id="newsFilterSelect" class="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white">
+                            <option value="all">Todas las Noticias</option>
+                            <option value="myNews">Mis Noticias</option>
+                        </select>
+                    </div>
+                    <div id="newsPostsContainer" class="space-y-6">
+                        </div>
+                </div>
+            </div>
+
+            <div id="trendingScreen" class="screen hidden">
+                <div class="max-w-3xl mx-auto bg-white dark:bg-gray-700 rounded-xl shadow-lg p-8 text-center">
+                    <h2 class="text-3xl font-bold mb-4 text-yellow-700 dark:text-yellow-400">Tendencias del Momento</h2>
+                    <i class="fas fa-chart-line text-6xl text-yellow-500 mb-6"></i>
+                    <p class="text-gray-700 dark:text-gray-300 text-lg">Aquí verás los chismes y noticias más populares y comentados.</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">¡Esta sección estará disponible en futuras actualizaciones!</p>
+                </div>
+            </div>
+
+            <div id="profileScreen" class="screen hidden">
+                <div class="max-w-3xl mx-auto bg-white dark:bg-gray-700 rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold mb-4 text-blue-700 dark:text-blue-400 text-center">Mi Perfil</h2>
+                    <div class="text-center mb-6">
+                        <i class="fas fa-user-circle text-6xl text-blue-500 mb-3"></i>
+                        <p class="text-xl font-semibold text-gray-800 dark:text-white" id="profileUsername">@usuario</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Miembro de Chismeando</p>
+                    </div>
+
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white border-b pb-2 border-gray-200 dark:border-gray-600">Mis Publicaciones</h3>
+                    <div id="myPostsContainer" class="space-y-4">
+                        <p class="text-center text-gray-500 dark:text-gray-400" id="noPostsMessage">Aún no has publicado nada. ¡Anímate a compartir!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aboutScreen" class="screen hidden">
+                <div class="max-w-3xl mx-auto bg-white dark:bg-gray-700 rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-700 dark:text-gray-300">Acerca de Chismeando</h2>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                        Chismeando es tu plataforma ideal para compartir y descubrir lo último en chismes y noticias. Creemos en la libertad de expresión y en la diversión de estar al tanto de lo que sucede, de una manera rápida y sin complicaciones.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                        Nuestra misión es crear un espacio dinámico y accesible donde la información fluya libremente, permitiendo a los usuarios interactuar con el contenido que más les interesa.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        ¡Gracias por ser parte de nuestra comunidad!
+                    </p>
+                    <div class="text-center mt-8">
+                        <i class="fas fa-quote-left text-4xl text-accent-color opacity-70"></i>
+                        <p class="text-xl italic text-gray-600 dark:text-gray-400 mt-2">"La verdad es como el chisme: siempre sale a la luz."</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 text-center p-4 text-sm hidden">
+            <p>&copy; 2023 Chismeando. Todos los derechos reservados.</p>
+            <p>Diseñado con <i class="fas fa-heart text-red-500"></i> para la comunidad.</p>
+        </footer>
+
+        <nav id="bottomNavBar" class="bottom-nav hidden">
+            <button id="navGossipBtn" class="bottom-nav-item active-nav" data-screen="gossipScreen">
+                <i class="fas fa-bullhorn"></i>
+                <span>Chismes</span>
+            </button>
+            <button id="navNewsBtn" class="bottom-nav-item" data-screen="newsScreen">
+                <i class="fas fa-newspaper"></i>
+                <span>Noticias</span>
+            </button>
+            <button id="navTrendingBtn" class="bottom-nav-item" data-screen="trendingScreen">
+                <i class="fas fa-fire"></i>
+                <span>Tendencias</span>
+            </button>
+            <button id="navProfileBtn" class="bottom-nav-item" data-screen="profileScreen">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </button>
+            <button id="navAboutBtn" class="bottom-nav-item" data-screen="aboutScreen">
+                <i class="fas fa-info-circle"></i>
+                <span>Acerca</span>
+            </button>
+        </nav>
+
+        <div id="toastNotification" class="toast"></div>
+
+        <div id="publishContentModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="hideModal('publishContentModal')">&times;</span>
+                <h3 class="text-2xl font-bold mb-6 text-center accent-color" id="publishModalTitle">Publicar Contenido</h3>
+                <form id="newContentForm" class="space-y-4">
+                    <div>
+                        <label for="contentType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Contenido</label>
+                        <select id="contentType" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white">
+                            <option value="gossip">Chisme</option>
+                            <option value="news">Noticia</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="contentAuthor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tu Nombre (opcional)</label>
+                        <input type="text" id="contentAuthor" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Ej. El Observador, Anónimo" readonly>
+                    </div>
+                    <div>
+                        <label for="contentTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Título</label>
+                        <input type="text" id="contentTitle" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Un titular que enganche..." required>
+                    </div>
+                    <button id="suggestTitleBtn" type="button" class="w-full bg-blue-500 text-white p-2 rounded-lg font-semibold text-sm hover:bg-blue-600 transition duration-300 ease-in-out mt-2">
+                        ✨ Sugerir Título
+                    </button>
+                    <div>
+                        <label for="contentBody" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contenido</label>
+                        <textarea id="contentBody" rows="6" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-accent-color focus:border-accent-color bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Detalles jugosos, rumores, noticias..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-accent-color text-white p-3 rounded-lg font-semibold hover:bg-accent-color-dark transition duration-300 ease-in-out">
+                        Publicar <i class="fas fa-paper-plane ml-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="gossipDetailModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="hideModal('gossipDetailModal')">&times;</span>
+                <h3 id="modalGossipTitle" class="text-2xl font-bold mb-2 text-gray-800 dark:text-white"></h3>
+                <p id="modalGossipMeta" class="text-sm text-gray-600 dark:text-gray-400 mb-4"></p>
+                <p id="modalGossipContent" class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"></p>
+                <div id="gossipSummary" class="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200 hidden">
+                    <p class="font-semibold">Resumen ✨:</p>
+                    <p id="gossipSummaryText"></p>
+                </div>
+                <div class="mt-4 flex items-center justify-between">
+                    <button id="summarizeGossipBtn" class="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition duration-300 ease-in-out">
+                        ✨ Resumir Contenido
+                    </button>
+                    <button class="like-button text-gray-600 dark:text-gray-400 hover:text-red-500 transition duration-200">
+                        <i class="far fa-heart mr-1"></i> <span class="like-count">0</span> Me gusta
+                    </button>
+                </div>
+                <div class="mt-6 border-t border-gray-200 dark:border-gray-600 pt-4">
+                    <h4 class="text-lg font-semibold mb-3 text-gray-800 dark:text-white">Comentarios (<span id="gossipCommentCount">0</span>)</h4>
+                    <div id="gossipCommentsContainer" class="space-y-3">
+                        </div>
+                    <form id="gossipCommentForm" class="mt-4 flex">
+                        <input type="text" id="gossipCommentInput" placeholder="Añadir comentario..." class="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-l-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        <button type="submit" class="bg-accent-color text-white p-2 rounded-r-md hover:bg-accent-color-dark">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="newsDetailModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="hideModal('newsDetailModal')">&times;</span>
+                <h3 id="modalNewsTitle" class="text-2xl font-bold mb-2 text-gray-800 dark:text-white"></h3>
+                <p id="modalNewsMeta" class="text-sm text-gray-600 dark:text-gray-400 mb-4"></p>
+                <p id="modalNewsContent" class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"></p>
+                <div id="newsSummary" class="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200 hidden">
+                    <p class="font-semibold">Resumen ✨:</p>
+                    <p id="newsSummaryText"></p>
+                </div>
+                <div class="mt-4 flex items-center justify-between">
+                    <button id="summarizeNewsBtn" class="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition duration-300 ease-in-out">
+                        ✨ Resumir Contenido
+                    </button>
+                    <button class="like-button text-gray-600 dark:text-gray-400 hover:text-red-500 transition duration-200">
+                        <i class="far fa-heart mr-1"></i> <span class="like-count">0</span> Me gusta
+                    </button>
+                </div>
+                <div class="mt-6 border-t border-gray-200 dark:border-gray-600 pt-4">
+                    <h4 class="text-lg font-semibold mb-3 text-gray-800 dark:text-white">Comentarios (<span id="newsCommentCount">0</span>)</h4>
+                    <div id="newsCommentsContainer" class="space-y-3">
+                        </div>
+                    <form id="newsCommentForm" class="mt-4 flex">
+                        <input type="text" id="newsCommentInput" placeholder="Añadir comentario..." class="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-l-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required>
+                        <button type="submit" class="bg-accent-color text-white p-2 rounded-r-md hover:bg-accent-color-dark">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const lightModeIcon = document.querySelector('.light-mode-icon');
+        const darkModeIcon = document.querySelector('.dark-mode-icon');
+
+        // Check for saved theme preference or default to light
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            lightModeIcon.classList.add('hidden');
+            darkModeIcon.classList.remove('hidden');
+        } else {
+            body.classList.remove('dark-mode');
+            lightModeIcon.classList.remove('hidden');
+            darkModeIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                lightModeIcon.classList.add('hidden');
+                darkModeIcon.classList.remove('hidden');
+            } else {
+                localStorage.setItem('theme', 'light');
+                lightModeIcon.classList.remove('hidden');
+                darkModeIcon.classList.add('hidden');
+            }
+        });
+
+        // --- Screen Management ---
+        const presentationScreen = document.getElementById('presentationScreen');
+        const authScreen = document.getElementById('authScreen');
+        const gossipScreen = document.getElementById('gossipScreen');
+        const newsScreen = document.getElementById('newsScreen');
+        const trendingScreen = document.getElementById('trendingScreen');
+        const profileScreen = document.getElementById('profileScreen');
+        const aboutScreen = document.getElementById('aboutScreen');
+
+        const allScreens = [presentationScreen, authScreen, gossipScreen, newsScreen, trendingScreen, profileScreen, aboutScreen];
+
+        const navButtons = document.querySelectorAll('.bottom-nav-item'); // Selects buttons in the bottom nav bar
+        const logoutBtn = document.getElementById('logoutBtn');
+        const bottomNavBar = document.getElementById('bottomNavBar');
+        const publishContentBtn = document.getElementById('publishContentBtn'); // Get publish button
+        const contentAuthorInput = document.getElementById('contentAuthor'); // For setting author in publish modal
+
+        let loggedInUser = localStorage.getItem('chismeandoLoggedInUser');
+        let isFirstVisit = localStorage.getItem('chismeandoFirstVisit') === null; // Check if it's the very first visit
+
+        function showScreen(screenId) {
+            allScreens.forEach(screen => {
+                screen.classList.add('hidden');
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            document.getElementById(screenId).classList.add('active');
+
+            // Update bottom nav button styles
+            navButtons.forEach(btn => {
+                btn.classList.remove('active-nav');
+            });
+            const activeNavButton = document.querySelector(`.bottom-nav-item[data-screen="${screenId}"]`);
+            if (activeNavButton) {
+                activeNavButton.classList.add('active-nav');
+            }
+
+            // Re-render content if necessary and set current user's info
+            if (screenId === 'gossipScreen') {
+                renderGossipPosts();
+            } else if (screenId === 'newsScreen') {
+                renderNewsPosts();
+            } else if (screenId === 'profileScreen') {
+                document.getElementById('profileUsername').textContent = `@${loggedInUser}`;
+                renderMyPosts();
+            }
+        }
+
+        function updateUI() {
+            if (isFirstVisit) {
+                showScreen('presentationScreen');
+                logoutBtn.classList.add('hidden');
+                bottomNavBar.classList.add('hidden');
+                publishContentBtn.classList.add('hidden'); // Hide publish button
+            } else if (loggedInUser) {
+                showScreen('gossipScreen'); // Default to gossip screen after login
+                logoutBtn.classList.remove('hidden');
+                bottomNavBar.classList.remove('hidden');
+                publishContentBtn.classList.remove('hidden'); // Show publish button
+                contentAuthorInput.value = loggedInUser; // Set default author
+            } else {
+                showScreen('authScreen');
+                logoutBtn.classList.add('hidden');
+                bottomNavBar.classList.add('hidden');
+                publishContentBtn.classList.add('hidden'); // Hide publish button
+            }
+        }
+
+        // Event listeners for bottom navigation buttons
+        navButtons.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetScreenId = item.dataset.screen;
+                showScreen(targetScreenId);
+            });
+        });
+
+        // --- Authentication Logic ---
+        let users = JSON.parse(localStorage.getItem('chismeandoUsers')) || {};
+
+        const startAppBtn = document.getElementById('startAppBtn');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const toggleAuthMode = document.getElementById('toggleAuthMode');
+        const authTitle = document.getElementById('authTitle');
+        const authMessage = document.getElementById('authMessage');
+
+        startAppBtn.addEventListener('click', () => {
+            isFirstVisit = false;
+            localStorage.setItem('chismeandoFirstVisit', 'false'); // Mark as visited
+            updateUI(); // Move to auth screen or main app
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (users[username] && users[username].password === password) {
+                loggedInUser = username;
+                localStorage.setItem('chismeandoLoggedInUser', username);
+                authMessage.textContent = '';
+                showToast(`¡Bienvenido de nuevo, ${username}!`);
+                updateUI(); // Go to main app
+            } else {
+                authMessage.textContent = 'Nombre de usuario o contraseña incorrectos.';
+            }
+        });
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                authMessage.textContent = 'Las contraseñas no coinciden.';
+                return;
+            }
+
+            if (users[username]) {
+                authMessage.textContent = 'Este nombre de usuario ya existe.';
+                return;
+            }
+
+            users[username] = { password: password };
+            localStorage.setItem('chismeandoUsers', JSON.stringify(users));
+            loggedInUser = username;
+            localStorage.setItem('chismeandoLoggedInUser', username);
+            authMessage.textContent = '';
+            showToast(`¡Registro exitoso! Bienvenido, ${username}.`);
+            setTimeout(() => {
+                updateUI(); // Go to main app after a short delay
+            }, 1000);
+        });
+
+        toggleAuthMode.addEventListener('click', () => {
+            if (loginForm.classList.contains('hidden')) {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                authTitle.textContent = 'Inicio de Sesión';
+                toggleAuthMode.textContent = '¿No tienes cuenta? Regístrate aquí.';
+            } else {
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                authTitle.textContent = 'Registro';
+                toggleAuthMode.textContent = '¿Ya tienes cuenta? Inicia sesión aquí.';
+            }
+            authMessage.textContent = ''; // Clear messages on toggle
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            loggedInUser = null;
+            localStorage.removeItem('chismeandoLoggedInUser');
+            showToast('¡Sesión cerrada!');
+            updateUI(); // Go back to auth screen
+            // Reset active nav item to gossip when logging out
+            document.querySelector('.bottom-nav-item.active-nav')?.classList.remove('active-nav');
+            document.querySelector('.bottom-nav-item[data-screen="gossipScreen"]').classList.add('active-nav');
+        });
+
+        // --- Modals Functions ---
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modals if clicking outside content
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+
+        // --- Toast Notification Function ---
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000); // Hide after 3 seconds
+        }
+
+        // --- Helper function to format time elapsed ---
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000; // years
+            if (interval > 1) return Math.floor(interval) + " año" + (Math.floor(interval) === 1 ? "" : "s");
+            interval = seconds / 2592000; // months
+            if (interval > 1) return Math.floor(interval) + " mes" + (Math.floor(interval) === 1 ? "" : "es");
+            interval = seconds / 86400; // days
+            if (interval > 1) return Math.floor(interval) + " día" + (Math.floor(interval) === 1 ? "" : "s");
+            interval = seconds / 3600; // hours
+            if (interval > 1) return Math.floor(interval) + " hora" + (Math.floor(interval) === 1 ? "" : "s");
+            interval = seconds / 60; // minutes
+            if (interval > 1) return Math.floor(interval) + " minuto" + (Math.floor(interval) === 1 ? "" : "s");
+            return Math.floor(seconds) + " segundo" + (Math.floor(seconds) === 1 ? "" : "s");
+        }
+
+        // --- Gemini API Call Function ---
+        async function callGeminiAPI(prompt) {
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will automatically provide this in runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Gemini API response structure unexpected:", result);
+                    return "Error al generar contenido.";
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                return "Error de conexión con la IA.";
+            }
+        }
+
+        // --- Content Publishing Logic (Combined for Gossip and News) ---
+        const publishContentModal = document.getElementById('publishContentModal');
+        const newContentForm = document.getElementById('newContentForm');
+        const contentTypeSelect = document.getElementById('contentType');
+        const contentTitleInput = document.getElementById('contentTitle');
+        const contentBodyInput = document.getElementById('contentBody');
+        const publishModalTitle = document.getElementById('publishModalTitle');
+        const suggestTitleBtn = document.getElementById('suggestTitleBtn'); // New button
+
+        let gossipEntries = JSON.parse(localStorage.getItem('chismeandoEntries')) || [];
+        let newsEntries = JSON.parse(localStorage.getItem('chismeandoNewsEntries')) || [];
+
+        // Function to render all gossip posts
+        function renderGossipPosts() {
+            const gossipPostsContainer = document.getElementById('gossipPostsContainer');
+            gossipPostsContainer.innerHTML = ''; // Clear existing posts
+            const searchTerm = document.getElementById('gossipSearchInput').value.toLowerCase();
+            const filterType = document.getElementById('gossipFilterSelect').value;
+
+            const filteredEntries = gossipEntries.filter(entry => {
+                const matchesSearch = entry.title.toLowerCase().includes(searchTerm) || entry.content.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterType === 'all' || (filterType === 'myGossip' && entry.publisher === loggedInUser);
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filteredEntries.length === 0) {
+                gossipPostsContainer.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 text-lg p-4">No se encontraron chismes con los filtros aplicados.</p>';
+                return;
+            }
+
+            filteredEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            filteredEntries.forEach((entry) => {
+                const postCard = document.createElement('div');
+                postCard.className = 'bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 border-l-4 border-purple-500 cursor-pointer interactive-element';
+
+                const date = new Date(entry.timestamp);
+                const timeAgo = formatTimeAgo(date);
+
+                postCard.innerHTML = `
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">${entry.title}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Publicado por ${entry.author} • ${timeAgo}</p>
+                    <p class="text-gray-700 dark:text-gray-300 line-clamp-3">${entry.content}</p>
+                    <div class="mt-4 flex items-center justify-between">
+                        <button class="like-button text-gray-600 dark:text-gray-400 hover:text-red-500 transition duration-200">
+                            <i class="far fa-heart mr-1"></i> <span class="like-count">${entry.likes || 0}</span> Me gusta
+                        </button>
+                        <button class="text-purple-600 dark:text-purple-400 hover:underline text-sm">Leer más</button>
+                    </div>
+                `;
+
+                // Event listener to open detail modal
+                postCard.querySelector('.text-purple-600').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent card click from firing
+                    showGossipDetail(entry);
+                });
+                // Event listener for the entire card to open detail modal
+                postCard.addEventListener('click', () => {
+                    showGossipDetail(entry);
+                });
+
+                // Add like button functionality
+                postCard.querySelector('.like-button').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    entry.likes = (entry.likes || 0) + 1;
+                    localStorage.setItem('chismeandoEntries', JSON.stringify(gossipEntries));
+                    renderGossipPosts(); // Re-render to update UI
+                });
+
+                gossipPostsContainer.appendChild(postCard);
+            });
+        }
+
+        // Function to render all news posts
+        function renderNewsPosts() {
+            const newsPostsContainer = document.getElementById('newsPostsContainer');
+            newsPostsContainer.innerHTML = ''; // Clear existing posts
+            const searchTerm = document.getElementById('newsSearchInput').value.toLowerCase();
+            const filterType = document.getElementById('newsFilterSelect').value;
+
+            const filteredEntries = newsEntries.filter(entry => {
+                const matchesSearch = entry.title.toLowerCase().includes(searchTerm) || entry.content.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterType === 'all' || (filterType === 'myNews' && entry.publisher === loggedInUser);
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filteredEntries.length === 0) {
+                newsPostsContainer.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 text-lg p-4">No se encontraron noticias con los filtros aplicados.</p>';
+                return;
+            }
+
+            filteredEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            filteredEntries.forEach((entry) => {
+                const postCard = document.createElement('div');
+                postCard.className = 'bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 border-l-4 border-green-500 cursor-pointer interactive-element';
+
+                const date = new Date(entry.timestamp);
+                const timeAgo = formatTimeAgo(date);
+
+                postCard.innerHTML = `
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">${entry.title}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Publicado por ${entry.author} • ${timeAgo}</p>
+                    <p class="text-gray-700 dark:text-gray-300 line-clamp-3">${entry.content}</p>
+                    <div class="mt-4 flex items-center justify-between">
+                        <button class="like-button text-gray-600 dark:text-gray-400 hover:text-red-500 transition duration-200">
+                            <i class="far fa-heart mr-1"></i> <span class="like-count">${entry.likes || 0}</span> Me gusta
+                        </button>
+                        <button class="text-green-600 dark:text-green-400 hover:underline text-sm">Leer más</button>
+                    </div>
+                `;
+
+                // Event listener to open detail modal
+                postCard.querySelector('.text-green-600').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent card click from firing
+                    showNewsDetail(entry);
+                });
+                // Event listener for the entire card to open detail modal
+                postCard.addEventListener('click', () => {
+                    showNewsDetail(entry);
+                });
+
+                // Add like button functionality
+                postCard.querySelector('.like-button').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    entry.likes = (entry.likes || 0) + 1;
+                    localStorage.setItem('chismeandoNewsEntries', JSON.stringify(newsEntries));
+                    renderNewsPosts(); // Re-render to update UI
+                });
+
+                newsPostsContainer.appendChild(postCard);
+            });
+        }
+
+        // Search and Filter Listeners
+        document.getElementById('gossipSearchInput').addEventListener('input', renderGossipPosts);
+        document.getElementById('gossipFilterSelect').addEventListener('change', renderGossipPosts);
+        document.getElementById('newsSearchInput').addEventListener('input', renderNewsPosts);
+        document.getElementById('newsFilterSelect').addEventListener('change', renderNewsPosts);
+
+
+        // Function to show full gossip content in a modal
+        function showGossipDetail(entry) {
+            const gossipDetailModal = document.getElementById('gossipDetailModal');
+            const modalGossipTitle = document.getElementById('modalGossipTitle');
+            const modalGossipMeta = document.getElementById('modalGossipMeta');
+            const modalGossipContent = document.getElementById('modalGossipContent');
+            const modalLikeButton = gossipDetailModal.querySelector('.like-button');
+            const modalLikeCount = modalLikeButton.querySelector('.like-count');
+            const gossipSummaryDiv = document.getElementById('gossipSummary');
+            const gossipSummaryText = document.getElementById('gossipSummaryText');
+            const summarizeGossipBtn = document.getElementById('summarizeGossipBtn');
+            const gossipCommentsContainer = document.getElementById('gossipCommentsContainer');
+            const gossipCommentForm = document.getElementById('gossipCommentForm');
+            const gossipCommentInput = document.getElementById('gossipCommentInput');
+            const gossipCommentCount = document.getElementById('gossipCommentCount');
+
+            // Reset summary section
+            gossipSummaryDiv.classList.add('hidden');
+            gossipSummaryText.textContent = '';
+
+            modalGossipTitle.textContent = entry.title;
+            const date = new Date(entry.timestamp);
+            const formattedDate = date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            modalGossipMeta.textContent = `Publicado por ${entry.author} • ${formattedDate}`;
+            modalGossipContent.textContent = entry.content;
+
+            modalLikeCount.textContent = entry.likes || 0;
+            modalLikeButton.onclick = (e) => {
+                e.stopPropagation(); // Prevent modal close
+                entry.likes = (entry.likes || 0) + 1;
+                localStorage.setItem('chismeandoEntries', JSON.stringify(gossipEntries));
+                modalLikeCount.textContent = entry.likes;
+                renderGossipPosts(); // Re-render to update the like count on the card
+            };
+
+            // Summarize button logic for gossip
+            summarizeGossipBtn.onclick = async () => {
+                summarizeGossipBtn.textContent = 'Generando resumen...';
+                summarizeGossipBtn.disabled = true;
+                const summary = await callGeminiAPI(`Genera un resumen conciso del siguiente chisme: ${entry.content}`);
+                if (summary && summary !== "Error al generar contenido." && summary !== "Error de conexión con la IA.") {
+                    gossipSummaryText.textContent = summary;
+                    gossipSummaryDiv.classList.remove('hidden');
+                } else {
+                    showToast('Error al generar resumen.');
+                }
+                summarizeGossipBtn.textContent = '✨ Resumir Contenido';
+                summarizeGossipBtn.disabled = false;
+            };
+
+            // Render comments
+            gossipCommentsContainer.innerHTML = ''; // Clear existing comments
+            if (entry.comments && entry.comments.length > 0) {
+                entry.comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'bg-gray-100 dark:bg-gray-700 p-2 rounded-lg text-sm';
+                    commentDiv.innerHTML = `<p class="font-semibold text-gray-800 dark:text-white">${comment.author}:</p><p class="text-gray-700 dark:text-gray-300">${comment.text}</p>`;
+                    gossipCommentsContainer.appendChild(commentDiv);
+                });
+            } else {
+                gossipCommentsContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-sm text-center">Sé el primero en comentar.</p>';
+            }
+            gossipCommentCount.textContent = (entry.comments ? entry.comments.length : 0);
+
+
+            // Comment form submission
+            gossipCommentForm.onsubmit = (e) => {
+                e.preventDefault();
+                const commentText = gossipCommentInput.value.trim();
+                if (commentText) {
+                    if (!entry.comments) {
+                        entry.comments = [];
+                    }
+                    entry.comments.push({
+                        author: loggedInUser || 'Anónimo',
+                        text: commentText,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('chismeandoEntries', JSON.stringify(gossipEntries));
+                    gossipCommentInput.value = ''; // Clear input
+                    showToast('Comentario añadido');
+                    showGossipDetail(entry); // Re-render modal to show new comment
+                }
+            };
+
+            showModal('gossipDetailModal');
+        }
+
+        // Function to show full news content in a modal
+        function showNewsDetail(entry) {
+            const newsDetailModal = document.getElementById('newsDetailModal');
+            const modalNewsTitle = document.getElementById('modalNewsTitle');
+            const modalNewsMeta = document.getElementById('modalNewsMeta');
+            const modalNewsContent = document.getElementById('modalNewsContent');
+            const modalLikeButton = newsDetailModal.querySelector('.like-button');
+            const modalLikeCount = modalLikeButton.querySelector('.like-count');
+            const newsSummaryDiv = document.getElementById('newsSummary');
+            const newsSummaryText = document.getElementById('newsSummaryText');
+            const summarizeNewsBtn = document.getElementById('summarizeNewsBtn');
+            const newsCommentsContainer = document.getElementById('newsCommentsContainer');
+            const newsCommentForm = document.getElementById('newsCommentForm');
+            const newsCommentInput = document.getElementById('newsCommentInput');
+            const newsCommentCount = document.getElementById('newsCommentCount');
+
+            // Reset summary section
+            newsSummaryDiv.classList.add('hidden');
+            newsSummaryText.textContent = '';
+
+            modalNewsTitle.textContent = entry.title;
+            const date = new Date(entry.timestamp);
+            const formattedDate = date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            modalNewsMeta.textContent = `Publicado por ${entry.author} • ${formattedDate}`;
+            modalNewsContent.textContent = entry.content;
+
+            modalLikeCount.textContent = entry.likes || 0;
+            modalLikeButton.onclick = (e) => {
+                e.stopPropagation(); // Prevent modal close
+                entry.likes = (entry.likes || 0) + 1;
+                localStorage.setItem('chismeandoNewsEntries', JSON.stringify(newsEntries));
+                modalLikeCount.textContent = entry.likes;
+                renderNewsPosts(); // Re-render to update the like count on the card
+            };
+
+            // Summarize button logic for news
+            summarizeNewsBtn.onclick = async () => {
+                summarizeNewsBtn.textContent = 'Generando resumen...';
+                summarizeNewsBtn.disabled = true;
+                const summary = await callGeminiAPI(`Genera un resumen conciso de la siguiente noticia: ${entry.content}`);
+                 if (summary && summary !== "Error al generar contenido." && summary !== "Error de conexión con la IA.") {
+                    newsSummaryText.textContent = summary;
+                    newsSummaryDiv.classList.remove('hidden');
+                } else {
+                    showToast('Error al generar resumen.');
+                }
+                summarizeNewsBtn.textContent = '✨ Resumir Contenido';
+                summarizeNewsBtn.disabled = false;
+            };
+
+            // Render comments
+            newsCommentsContainer.innerHTML = ''; // Clear existing comments
+            if (entry.comments && entry.comments.length > 0) {
+                entry.comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'bg-gray-100 dark:bg-gray-700 p-2 rounded-lg text-sm';
+                    commentDiv.innerHTML = `<p class="font-semibold text-gray-800 dark:text-white">${comment.author}:</p><p class="text-gray-700 dark:text-gray-300">${comment.text}</p>`;
+                    newsCommentsContainer.appendChild(commentDiv);
+                });
+            } else {
+                newsCommentsContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-sm text-center">Sé el primero en comentar.</p>';
+            }
+            newsCommentCount.textContent = (entry.comments ? entry.comments.length : 0);
+
+            // Comment form submission
+            newsCommentForm.onsubmit = (e) => {
+                e.preventDefault();
+                const commentText = newsCommentInput.value.trim();
+                if (commentText) {
+                    if (!entry.comments) {
+                        entry.comments = [];
+                    }
+                    entry.comments.push({
+                        author: loggedInUser || 'Anónimo',
+                        text: commentText,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('chismeandoNewsEntries', JSON.stringify(newsEntries));
+                    newsCommentInput.value = ''; // Clear input
+                    showToast('Comentario añadido');
+                    showNewsDetail(entry); // Re-render modal to show new comment
+                }
+            };
+
+            showModal('newsDetailModal');
+        }
+
+        // Render user's own posts on profile screen
+        function renderMyPosts() {
+            const myPostsContainer = document.getElementById('myPostsContainer');
+            const noPostsMessage = document.getElementById('noPostsMessage');
+            myPostsContainer.innerHTML = ''; // Clear existing posts
+
+            const userGossip = gossipEntries.filter(entry => entry.publisher === loggedInUser);
+            const userNews = newsEntries.filter(entry => entry.publisher === loggedInUser);
+            const allUserPosts = [...userGossip, ...userNews].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if (allUserPosts.length === 0) {
+                noPostsMessage.classList.remove('hidden');
+            } else {
+                noPostsMessage.classList.add('hidden');
+                allUserPosts.forEach(post => {
+                    const postCard = document.createElement('div');
+                    const postTypeClass = post.type === 'gossip' ? 'border-purple-500' : 'border-green-500';
+                    const detailFunction = post.type === 'gossip' ? 'showGossipDetail' : 'showNewsDetail';
+
+                    postCard.className = `bg-white dark:bg-gray-700 rounded-xl shadow-md p-4 border-l-4 ${postTypeClass} cursor-pointer interactive-element`;
+                    postCard.innerHTML = `
+                        <h4 class="text-lg font-semibold mb-1 text-gray-800 dark:text-white">${post.title}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Tipo: ${post.type === 'gossip' ? 'Chisme' : 'Noticia'} • ${formatTimeAgo(new Date(post.timestamp))}</p>
+                        <p class="text-gray-700 dark:text-gray-300 line-clamp-2">${post.content}</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-gray-600 dark:text-gray-400 text-sm">
+                                <i class="fas fa-heart mr-1"></i> ${post.likes || 0} Me gusta
+                                <i class="fas fa-comment ml-3 mr-1"></i> ${(post.comments ? post.comments.length : 0)} Comentarios
+                            </span>
+                            <button onclick="${detailFunction}(${JSON.stringify(post).replace(/"/g, '&quot;')})" class="text-accent-color hover:underline text-sm">Ver Detalles</button>
+                        </div>
+                    `;
+                    myPostsContainer.appendChild(postCard);
+                });
+            }
+        }
+
+        // Handle new content form submission
+        newContentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = contentTypeSelect.value;
+            const author = contentAuthorInput.value.trim() || 'Anónimo';
+            const title = contentTitleInput.value.trim();
+            const content = contentBodyInput.value.trim();
+
+            if (title && content) {
+                const newEntry = {
+                    type: type, // Add type to entry
+                    author: author,
+                    publisher: loggedInUser, // Store who published it (the logged in user)
+                    title: title,
+                    content: content,
+                    timestamp: new Date().toISOString(),
+                    likes: 0, // Initialize likes
+                    comments: [] // Initialize comments
+                };
+
+                if (type === 'gossip') {
+                    gossipEntries.push(newEntry);
+                    localStorage.setItem('chismeandoEntries', JSON.stringify(gossipEntries));
+                    renderGossipPosts();
+                } else if (type === 'news') {
+                    newsEntries.push(newEntry);
+                    localStorage.setItem('chismeandoNewsEntries', JSON.stringify(newsEntries));
+                    renderNewsPosts();
+                }
+
+                newContentForm.reset(); // Clear the form
+                hideModal('publishContentModal'); // Close the modal after publishing
+                showToast('¡Contenido publicado con éxito!');
+            } else {
+                showToast('Por favor, completa el título y el contenido.');
+            }
+        });
+
+        // Event listener for Suggest Title button
+        suggestTitleBtn.addEventListener('click', async () => {
+            const content = contentBodyInput.value.trim();
+            if (content.length > 20) { // Only suggest if content is somewhat substantial
+                suggestTitleBtn.textContent = 'Generando...';
+                suggestTitleBtn.disabled = true;
+                const type = contentTypeSelect.value === 'gossip' ? 'chisme' : 'noticia';
+                const prompt = `Genera un título corto y llamativo para un ${type} con el siguiente contenido: ${content}`;
+                const suggestedTitle = await callGeminiAPI(prompt);
+                if (suggestedTitle && suggestedTitle !== "Error al generar contenido." && suggestedTitle !== "Error de conexión con la IA.") {
+                    contentTitleInput.value = suggestedTitle.replace(/^"|"$/g, ''); // Remove quotes if present
+                } else {
+                    showToast('No se pudo generar un título. Inténtalo de nuevo más tarde.');
+                }
+                suggestTitleBtn.textContent = '✨ Sugerir Título';
+                suggestTitleBtn.disabled = false;
+            } else {
+                showToast('Por favor, escribe un poco más de contenido para sugerir un título.');
+            }
+        });
+
+
+        // Event listener to open the publish content modal
+        publishContentBtn.addEventListener('click', () => {
+            publishModalTitle.textContent = 'Publicar Contenido';
+            contentAuthorInput.value = loggedInUser; // Pre-fill author with logged in user
+            showModal('publishContentModal');
+        });
+
+        // Initial render of content when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI(); // Decide which screen to show on initial load
+        });
+    </script>
+</body>
+</html>
